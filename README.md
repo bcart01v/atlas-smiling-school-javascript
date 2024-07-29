@@ -1,5 +1,8 @@
 # Holberton Smiling School (Bootstrap Project)
 
+## Note 
+For the Atlas Project, only Homepage, Courses, and Pricing will be updated. Nothing starting with #- will be updated, that's silly. 
+
 These group of web pages were coded from scratch with the help of the Boostrap Framework and based on some design models given on Figma.
 
 [Figma Homepage](https://www.figma.com/file/QYQqMYbdpAHL5xTclwJKSI/Homepage)
