@@ -171,16 +171,17 @@
               Most <span class="main-color">popular</span> tutorials
             </h2>
           </header>
-          <div id="popular-loader" class="d-block text-center my-3">
-            <div class="spinner-border text-light" role="status">
-              <span class="sr-only">Loading...</span>
-            </div>
+        <div id="popular-loader" class="d-block text-center my-3 position-relative">
+          <svg class="spinner" width="50px" height="50px" viewBox="0 0 50 50" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+            <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5" stroke="#ddd"></circle>
+            <circle class="arc" cx="25" cy="25" r="20" fill="none" stroke-width="5" stroke="#8e44ad" stroke-linecap="round"></circle>
+          </svg>
+        </div>
+        
+        <div id="carouselExampleControls2" class="carousel slide d-none" data-ride="carousel">
+          <div class="carousel-inner" id="popular-carousel-inner">
+        <!-- Dynamic content will be loaded here -->
           </div>
-          <div id="carouselExampleControls2" class="carousel slide d-none" data-ride="carousel">
-            <div class="carousel-inner" id="popular-carousel-inner">
-              <!-- Dynamic content will be loaded here -->
-              <!-- BJC - For chrome dev purposes -->
-            </div>
             <a class="carousel-control-prev arrow-left" href="#carouselExampleControls2" role="button" data-slide="prev">
               <img src="images/arrow_black_left.png" alt="Previous" aria-hidden="true" />
               <span class="sr-only">Previous</span>

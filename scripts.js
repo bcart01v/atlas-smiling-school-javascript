@@ -50,28 +50,28 @@ $(document).ready(function () {
     beforeSend: function() {
       $('#popular-loader').removeClass('d-none').addClass('d-block');
       $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
+        animateSpinner();
     },
     success: function (data) {
       const popularCarouselInner = $('#popular-carousel-inner');
-      const chunkSize = 4; 
-
-      for (let i = 0; i < data.length; i += chunkSize) {
-        const chunk = data.slice(i, i + chunkSize);
-        const activeClass = i === 0 ? ' active' : '';
-        let carouselItem = `<div class="carousel-item${activeClass}"><div class="row">`;
-
-        chunk.forEach(tutorial => {
-          carouselItem += `
-            <div class="col-lg-3 col-md-6 mb-4">
-              <div class="card">
-                <img src="${tutorial.thumb_url}" class="card-img-top" alt="${tutorial.title}">
-                <div class="card-img-overlay text-center">
-                  <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay">
-                </div>
-                <div class="card-body">
-                  <h5 class="card-title font-weight-bold">${tutorial.title}</h5>
-                  <p class="card-text text-muted">${tutorial['sub-title']}</p>
-                  <div class="creator d-flex align-items-center">
+      const chunkSize = 4;
+        for (let i = 0; i < data.length; i += chunkSize) {
+          const chunk = data.slice(i, i + chunkSize);
+          const activeClass = i === 0 ? ' active' : '';
+          let carouselItem = `<div class="carousel-item${activeClass}"><div class="row">`;
+  
+          chunk.forEach(tutorial => {
+            carouselItem += `
+              <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card">
+                  <img src="${tutorial.thumb_url}" class="card-img-top" alt="${tutorial.title}">
+                  <div class="card-img-overlay text-center">
+                    <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay">
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title font-weight-bold">${tutorial.title}</h5>
+                    <p class="card-text text-muted">${tutorial['sub-title']}</p>
+                    <div class="creator d-flex align-items-center">
                     <img src="${tutorial.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle">
                     <h6 class="pl-3 m-0 main-color">${tutorial.author}</h6>
                   </div>
@@ -88,15 +88,37 @@ $(document).ready(function () {
 
         carouselItem += `</div></div>`;
         popularCarouselInner.append(carouselItem);
+        }
+  
+        $('#popular-loader').removeClass('d-block').addClass('d-none');
+        $('#carouselExampleControls2').removeClass('d-none').addClass('d-block');
+      },
+      error: function (error) {
+        console.error('Error fetching popular tutorials:', error);
+        $('#popular-loader').removeClass('d-block').addClass('d-none');
+        $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
       }
-
-      $('#popular-loader').removeClass('d-block').addClass('d-none');
-      $('#carouselExampleControls2').removeClass('d-none').addClass('d-block');
-    },
-    error: function (error) {
-      console.error('Error fetching popular tutorials:', error);
-      $('#popular-loader').removeClass('d-block').addClass('d-none');
-      $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
+    });
+  
+    function animateSpinner() {
+      const arc = document.querySelector('.arc');
+      let startAngle = 0;
+      let endAngle = 0;
+      const radius = 20;
+      const circumference = 2 * Math.PI * radius;
+      arc.setAttribute('stroke-dasharray', circumference);
+      arc.setAttribute('stroke-dashoffset', circumference);
+  
+      function drawArc() {
+        startAngle += 4;
+        endAngle += 4;
+        if (endAngle >= 360) endAngle = 0;
+        const offset = circumference - (circumference * endAngle) / 360;
+        arc.setAttribute('stroke-dashoffset', offset);
+        requestAnimationFrame(drawArc);
+      }
+  
+      drawArc();
     }
   });
-});
+  
