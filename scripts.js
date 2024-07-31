@@ -1,3 +1,4 @@
+// JS For API Quotes Section
 $(document).ready(function () {
     $.ajax({
       url: 'https://smileschool-api.hbtn.info/quotes',
@@ -40,4 +41,62 @@ $(document).ready(function () {
       }
     });
   });
-  
+
+  // JS for Popular Tutorials Section
+  $(document).ready(function () {
+  $.ajax({
+    url: 'https://smileschool-api.hbtn.info/popular-tutorials',
+    method: 'GET',
+    beforeSend: function() {
+      $('#popular-loader').removeClass('d-none').addClass('d-block');
+      $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
+    },
+    success: function (data) {
+      const popularCarouselInner = $('#popular-carousel-inner');
+      const chunkSize = 4; 
+
+      for (let i = 0; i < data.length; i += chunkSize) {
+        const chunk = data.slice(i, i + chunkSize);
+        const activeClass = i === 0 ? ' active' : '';
+        let carouselItem = `<div class="carousel-item${activeClass}"><div class="row">`;
+
+        chunk.forEach(tutorial => {
+          carouselItem += `
+            <div class="col-lg-3 col-md-6 mb-4">
+              <div class="card">
+                <img src="${tutorial.thumb_url}" class="card-img-top" alt="${tutorial.title}">
+                <div class="card-img-overlay text-center">
+                  <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay">
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title font-weight-bold">${tutorial.title}</h5>
+                  <p class="card-text text-muted">${tutorial['sub-title']}</p>
+                  <div class="creator d-flex align-items-center">
+                    <img src="${tutorial.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle">
+                    <h6 class="pl-3 m-0 main-color">${tutorial.author}</h6>
+                  </div>
+                  <div class="info pt-3 d-flex justify-content-between">
+                    <div class="rating">
+                      ${'★'.repeat(tutorial.star)}${'☆'.repeat(5 - tutorial.star)}
+                    </div>
+                    <span class="main-color">${tutorial.duration}</span>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+        });
+
+        carouselItem += `</div></div>`;
+        popularCarouselInner.append(carouselItem);
+      }
+
+      $('#popular-loader').removeClass('d-block').addClass('d-none');
+      $('#carouselExampleControls2').removeClass('d-none').addClass('d-block');
+    },
+    error: function (error) {
+      console.error('Error fetching popular tutorials:', error);
+      $('#popular-loader').removeClass('d-block').addClass('d-none');
+      $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
+    }
+  });
+});
