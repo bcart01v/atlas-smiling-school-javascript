@@ -1,5 +1,5 @@
-// JS For API Quotes Section
 $(document).ready(function () {
+    // Quotes Section
     $.ajax({
       url: 'https://smileschool-api.hbtn.info/quotes',
       method: 'GET',
@@ -40,25 +40,25 @@ $(document).ready(function () {
         $('#carouselExampleControls').removeClass('d-block').addClass('d-none');
       }
     });
-  });
-
-  // JS for Popular Tutorials Section
-  $(document).ready(function () {
-  $.ajax({
-    url: 'https://smileschool-api.hbtn.info/popular-tutorials',
-    method: 'GET',
-    beforeSend: function() {
-      $('#popular-loader').removeClass('d-none').addClass('d-block');
-      $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
+  
+    // Popular Tutorials Section
+    $.ajax({
+      url: 'https://smileschool-api.hbtn.info/popular-tutorials',
+      method: 'GET',
+      beforeSend: function() {
+        $('#popular-loader').removeClass('d-none').addClass('d-block');
+        $('#carouselExampleControls2').removeClass('d-block').addClass('d-none');
         animateSpinner();
-    },
-    success: function (data) {
-      const popularCarouselInner = $('#popular-carousel-inner');
-      const chunkSize = 4;
+      },
+      success: function (data) {
+        const popularCarouselInner = $('#popular-carousel-inner');
+        const isMobile = $(window).width() < 576;
+        const chunkSize = isMobile ? 1 : 4; // Adjust chunk size based on screen width
+  
         for (let i = 0; i < data.length; i += chunkSize) {
           const chunk = data.slice(i, i + chunkSize);
           const activeClass = i === 0 ? ' active' : '';
-          let carouselItem = `<div class="carousel-item${activeClass}"><div class="row">`;
+          let carouselItem = `<div class="carousel-item${activeClass}"><div class="row justify-content-center">`;
   
           chunk.forEach(tutorial => {
             carouselItem += `
@@ -72,22 +72,22 @@ $(document).ready(function () {
                     <h5 class="card-title font-weight-bold">${tutorial.title}</h5>
                     <p class="card-text text-muted">${tutorial['sub-title']}</p>
                     <div class="creator d-flex align-items-center">
-                    <img src="${tutorial.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle">
-                    <h6 class="pl-3 m-0 main-color">${tutorial.author}</h6>
-                  </div>
-                  <div class="info pt-3 d-flex justify-content-between">
-                    <div class="rating">
-                      ${'★'.repeat(tutorial.star)}${'☆'.repeat(5 - tutorial.star)}
+                      <img src="${tutorial.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle">
+                      <h6 class="pl-3 m-0 main-color">${tutorial.author}</h6>
                     </div>
-                    <span class="main-color">${tutorial.duration}</span>
+                    <div class="info pt-3 d-flex justify-content-between">
+                      <div class="rating">
+                        ${'★'.repeat(tutorial.star)}${'☆'.repeat(5 - tutorial.star)}
+                      </div>
+                      <span class="main-color">${tutorial.duration}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>`;
-        });
-
-        carouselItem += `</div></div>`;
-        popularCarouselInner.append(carouselItem);
+              </div>`;
+          });
+  
+          carouselItem += `</div></div>`;
+          popularCarouselInner.append(carouselItem);
         }
   
         $('#popular-loader').removeClass('d-block').addClass('d-none');
@@ -100,6 +100,67 @@ $(document).ready(function () {
       }
     });
   
+    // Latest Videos Section
+    $.ajax({
+      url: 'https://smileschool-api.hbtn.info/latest-videos',
+      method: 'GET',
+      beforeSend: function() {
+        $('#latest-loader').removeClass('d-none').addClass('d-block');
+        $('#carouselExampleControls3').removeClass('d-block').addClass('d-none');
+        animateSpinner();
+      },
+      success: function (data) {
+        const latestCarouselInner = $('#latest-carousel-inner');
+        const isMobile = $(window).width() < 576;
+        const chunkSize = isMobile ? 1 : 4; // Adjust chunk size based on screen width
+  
+        for (let i = 0; i < data.length; i += chunkSize) {
+          const chunk = data.slice(i, i + chunkSize);
+          const activeClass = i === 0 ? ' active' : '';
+          let carouselItem = `<div class="carousel-item${activeClass}"><div class="row justify-content-center">`;
+  
+          chunk.forEach(video => {
+            carouselItem += `
+              <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card">
+                  <img src="${video.thumb_url}" class="card-img-top" alt="${video.title}">
+                  <div class="card-img-overlay text-center">
+                    <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay">
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title font-weight-bold">${video.title}</h5>
+                    <p class="card-text text-muted">${video['sub-title']}</p>
+                    <div class="creator d-flex align-items-center">
+                      <img src="${video.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle">
+                      <h6 class="pl-3 m-0 main-color">${video.author}</h6>
+                    </div>
+                    <div class="info pt-3 d-flex justify-content-between">
+                      <div class="rating">
+                        ${'★'.repeat(video.star)}${'☆'.repeat(5 - video.star)}
+                      </div>
+                      <span class="main-color">${video.duration}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+          });
+  
+          carouselItem += `</div></div>`;
+          latestCarouselInner.append(carouselItem);
+        }
+  
+        $('#latest-loader').removeClass('d-block').addClass('d-none');
+        $('#carouselExampleControls3').removeClass('d-none').addClass('d-block');
+        $('#carouselExampleControls3').carousel(); // Initialize carousel after appending items
+      },
+      error: function (error) {
+        console.error('Error fetching latest videos:', error);
+        $('#latest-loader').removeClass('d-block').addClass('d-none');
+        $('#carouselExampleControls3').removeClass('d-block').addClass('d-none');
+      }
+    });
+  
+    // Spinner animation function
     function animateSpinner() {
       const arc = document.querySelector('.arc');
       let startAngle = 0;
