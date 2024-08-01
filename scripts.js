@@ -36,13 +36,19 @@ $(document).ready(function () {
   
     // Fetch and display courses
     function fetchCourses(queryParams = {}) {
-      $('#video-list').html('<div class="loader">Loading...</div>'); // Show loader
+      $('#video-list').html(`
+        <div id="course-loader" class="d-flex justify-content-center align-items-center my-5">
+          <div class="spinner-border" role="status" style="color: #c271ff;">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      `); // Show loader
   
       $.ajax({
         url: 'https://smileschool-api.hbtn.info/courses',
         data: queryParams,
         success: function (response) {
-          $('.loader').remove(); // Remove loader
+          $('#course-loader').remove(); // Remove loader
           const courses = response.courses;
           const videoCount = courses.length;
           $('.video-count').text(`${videoCount} videos`); // Update video count
