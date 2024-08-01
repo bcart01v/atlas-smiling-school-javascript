@@ -1,4 +1,125 @@
 $(document).ready(function () {
+    // Helper function to generate star ratings
+    function generateStars(starCount) {
+      let stars = '';
+      for (let i = 1; i <= 5; i++) {
+        stars += `<img src="images/star_${i <= starCount ? 'on' : 'off'}.png" alt="star" width="15px" />`;
+      }
+      return stars;
+    }
+  
+    // Spinner animation function
+    function animateSpinner() {
+      const arc = document.querySelector('.arc');
+      if (!arc) {
+        console.warn('Spinner element not found');
+        return;
+      }
+      let startAngle = 0;
+      let endAngle = 0;
+      const radius = 20;
+      const circumference = 2 * Math.PI * radius;
+      arc.setAttribute('stroke-dasharray', circumference);
+      arc.setAttribute('stroke-dashoffset', circumference);
+  
+      function drawArc() {
+        startAngle += 4;
+        endAngle += 4;
+        if (endAngle >= 360) endAngle = 0;
+        const offset = circumference - (circumference * endAngle) / 360;
+        arc.setAttribute('stroke-dashoffset', offset);
+        requestAnimationFrame(drawArc);
+      }
+  
+      drawArc();
+    }
+  
+    // Fetch and display courses
+    function fetchCourses(queryParams = {}) {
+      $('#video-list').html('<div class="loader">Loading...</div>'); // Show loader
+  
+      $.ajax({
+        url: 'https://smileschool-api.hbtn.info/courses',
+        data: queryParams,
+        success: function (response) {
+          $('.loader').remove(); // Remove loader
+          const courses = response.courses;
+          const videoCount = courses.length;
+          $('.video-count').text(`${videoCount} videos`); // Update video count
+  
+          $('#video-list').empty();
+          courses.forEach(course => {
+            $('#video-list').append(`
+              <div class="col-12 col-sm-4 col-lg-3 d-flex justify-content-center">
+                <div class="card">
+                  <img src="${course.thumb_url}" class="card-img-top" alt="Video thumbnail" />
+                  <div class="card-img-overlay text-center">
+                    <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay" />
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title font-weight-bold">${course.title}</h5>
+                    <p class="card-text text-muted">${course['sub-title']}</p>
+                    <div class="creator d-flex align-items-center">
+                      <img src="${course.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle" />
+                      <h6 class="pl-3 m-0 main-color">${course.author}</h6>
+                    </div>
+                    <div class="info pt-3 d-flex justify-content-between">
+                      <div class="rating">
+                        ${generateStars(course.star)}
+                      </div>
+                      <span class="main-color">${course.duration}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `);
+          });
+        },
+        error: function (error) {
+          console.error('Error fetching courses:', error);
+        }
+      });
+    }
+  
+    // Load dropdowns for topics and sorts
+    function loadDropdowns() {
+      $.ajax({
+        url: 'https://smileschool-api.hbtn.info/courses',
+        success: function (response) {
+          const topics = response.topics;
+          const sorts = response.sorts;
+  
+          $('#topic-dropdown').empty();
+          topics.forEach(topic => {
+            $('#topic-dropdown').append(`<a class="dropdown-item" href="#" data-topic="${topic}">${topic}</a>`);
+          });
+  
+          $('#sort-dropdown').empty();
+          sorts.forEach(sort => {
+            $('#sort-dropdown').append(`<a class="dropdown-item" href="#" data-sort="${sort}">${sort}</a>`);
+          });
+  
+          $('#search-keywords').val(response.q);
+  
+          // Event listeners for dropdowns
+          $('#topic-dropdown a').click(function (e) {
+            e.preventDefault();
+            $('#selected-topic').text($(this).text());
+            fetchCourses({ q: $('#search-keywords').val(), topic: $(this).data('topic'), sort: $('#selected-sort').text() });
+          });
+  
+          $('#sort-dropdown a').click(function (e) {
+            e.preventDefault();
+            $('#selected-sort').text($(this).text());
+            fetchCourses({ q: $('#search-keywords').val(), topic: $('#selected-topic').text(), sort: $(this).data('sort') });
+          });
+        },
+        error: function (error) {
+          console.error('Error loading dropdowns:', error);
+        }
+      });
+    }
+  
     // Quotes Section
     $.ajax({
       url: 'https://smileschool-api.hbtn.info/quotes',
@@ -54,6 +175,7 @@ $(document).ready(function () {
         const popularCarouselInner = $('#popular-carousel-inner');
         const isMobile = $(window).width() < 576;
         const chunkSize = isMobile ? 1 : 4; // Adjust chunk size based on screen width
+        // Could never figure out how to get this to 1 item on mobile. Not sure how to troubleshoot.
   
         for (let i = 0; i < data.length; i += chunkSize) {
           const chunk = data.slice(i, i + chunkSize);
@@ -160,26 +282,13 @@ $(document).ready(function () {
       }
     });
   
-    // Spinner animation function
-    function animateSpinner() {
-      const arc = document.querySelector('.arc');
-      let startAngle = 0;
-      let endAngle = 0;
-      const radius = 20;
-      const circumference = 2 * Math.PI * radius;
-      arc.setAttribute('stroke-dasharray', circumference);
-      arc.setAttribute('stroke-dashoffset', circumference);
+    // Initialize dropdowns and courses
+    loadDropdowns();
+    fetchCourses();
   
-      function drawArc() {
-        startAngle += 4;
-        endAngle += 4;
-        if (endAngle >= 360) endAngle = 0;
-        const offset = circumference - (circumference * endAngle) / 360;
-        arc.setAttribute('stroke-dashoffset', offset);
-        requestAnimationFrame(drawArc);
-      }
-  
-      drawArc();
-    }
+    // Event listener for search input
+    $('#search-keywords').on('input', function () {
+      fetchCourses({ q: $(this).val(), topic: $('#selected-topic').text(), sort: $('#selected-sort').text() });
+    });
   });
   
